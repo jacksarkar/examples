@@ -1,0 +1,153 @@
+import React, { useState, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+
+const menuItems = {
+  HOME: "This is the HOME section of the TREAD website.",
+  CASE: {
+    manual: "The CASE section manages legal cases.",
+    subItems: {
+      Add: "Add a new case to the system.",
+      List: "View the list of existing cases.",
+    },
+  },
+  UPLOAD: {
+    manual: "The UPLOAD section allows you to upload data files.",
+    subItems: {
+      CDR: "Upload Call Detail Records (CDR).",
+      IPDR: "Upload Internet Protocol Detail Records (IPDR).",
+      "TOWER DUMP": "Upload tower dump data.",
+      "IPDR DUMP": "Upload IPDR dump data.",
+    },
+  },
+  "ACTIVE CASE": {
+    manual: "Manage and analyze active cases.",
+    subItems: {
+      "Change Analysis Date Limits (Currently-to-)": "Modify the analysis date range.",
+      "Turn on/off skipping Unwanted data (Currently off)": "Enable or disable skipping of unwanted data.",
+      "Turn on/off skipping single call in graph ( currently off )": "Enable or disable skipping of single calls in graphs.",
+      "List CDRs": "View Call Detail Records.",
+      "List IPDRs": "View Internet Protocol Detail Records.",
+      "List Tower Dumps": "View tower dump data.",
+      "List IPDR Dumps": "View IPDR dump data.",
+    },
+  },
+  ANALYZE: {
+    manual: "Analyze different types of data.",
+    subItems: {
+      CDR: "Analyze Call Detail Records.",
+      IPDR: "Analyze Internet Protocol Detail Records.",
+      "TOWER DUMP": "Analyze tower dump data.",
+      "IPDR DUMP": "Analyze IPDR dump data.",
+      "COMMON DATA": "Analyze common data across records.",
+    },
+  },
+  SEARCH: {
+    manual: "Search through various records.",
+    subItems: {
+      SDR: "Search SDR records.",
+      "SDR by ID Number": "Search SDR by ID number.",
+      "SDR by Email ID": "Search SDR by Email ID.",
+      "SDR by Name": "Search SDR by Name.",
+      "Tower Data": "Search tower-related data.",
+      "Nearest Towers": "Find the nearest towers.",
+      "ISP from IP Address": "Find the ISP from an IP Address.",
+      "SMS Header": "Search by SMS header.",
+      "Search Number in Database": "Find a phone number in the database.",
+      "Search IMEI in Database": "Find an IMEI number in the database.",
+    },
+  },
+  BUGS: {
+    manual: "Report and track bugs.",
+    subItems: {
+      "Create Bug": "Report a new bug.",
+      "List Bugs": "View a list of reported bugs.",
+    },
+  },
+  LOGOUT: "Click here to log out of the system.",
+};
+
+export default function TreadManual() {
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedSubItem, setSelectedSubItem] = useState(null);
+
+  const handleMenuClick = useCallback((item) => {
+    setSelectedItem((prev) => (prev === item ? null : item));
+    setSelectedSubItem(null);
+  }, []);
+
+  const handleSubMenuClick = useCallback((subItem) => {
+    setSelectedSubItem(subItem);
+  }, []);
+
+  return (
+    <div className="flex h-screen bg-black text-green-300 font-mono">
+      <div className="w-1/4 bg-gray-900 text-white p-4 border-r-4 border-green-500 shadow-xl">
+        <h1 className="text-xl font-bold text-green-400 mb-4">TREAD Manual</h1>
+        {Object.keys(menuItems).map((item) => (
+          <div key={item}>
+            <button
+              className="w-full text-left p-2 hover:bg-green-700 transition duration-300"
+              onClick={() => handleMenuClick(item)}
+            >
+              {item}
+            </button>
+            <AnimatePresence>
+              {selectedItem === item && menuItems[item].subItems && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="ml-4 border-l-2 border-green-500 pl-2"
+                >
+                  {Object.keys(menuItems[item].subItems).map((subItem) => (
+                    <button
+                      key={subItem}
+                      className="w-full text-left p-2 hover:bg-green-600 transition duration-300"
+                      onClick={() => handleSubMenuClick(subItem)}
+                    >
+                      {subItem}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ))}
+      </div>
+      <div className="w-3/4 p-6 bg-gray-800 text-green-200 border-l-4 border-green-500 shadow-lg">
+        <AnimatePresence mode="wait">
+          {selectedSubItem ? (
+            <motion.p
+              key={selectedSubItem}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-lg font-semibold"
+            >
+              {menuItems[selectedItem].subItems[selectedSubItem]}
+            </motion.p>
+          ) : selectedItem ? (
+            <motion.p
+              key={selectedItem}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-lg font-semibold"
+            >
+              {menuItems[selectedItem].manual || menuItems[selectedItem]}
+            </motion.p>
+          ) : (
+            <motion.p
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="text-lg font-semibold text-green-400"
+            >
+              Select an option to view its manual.
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
